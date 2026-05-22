@@ -119,7 +119,17 @@ export type Screen =
   | 'payment_select'
   | 'card_payment'
   | 'cash_payment'
-  | 'receipt';
+  | 'receipt'
+  | 'customer_list'
+  | 'customer_detail'
+  | 'customer_new';
+
+export interface CustomerFormData {
+  entityType: 'company' | 'individual';
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+}
 
 export type PaymentType = 'card' | 'cash' | 'invoice';
 

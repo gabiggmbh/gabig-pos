@@ -51,7 +51,7 @@ function QuickActions({ onManualSearch, onCustomerPicker }: { onManualSearch: ()
 }
 
 function CustomerPicker() {
-  const { setCustomer, navigate, sale } = useApp();
+  const { setCustomer, navigate, sale, openCustomerNew } = useApp();
   const [search, setSearch] = React.useState('');
   const [results, setResults] = React.useState<CustomerDto[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -169,7 +169,7 @@ function CustomerPicker() {
           })}
         </div>
         <div className="pk-foot">
-          <button className="ghost-btn"><Icon d={ICONS.plus} size={13} /> Neuer Kunde</button>
+          <button className="ghost-btn" onClick={() => openCustomerNew('sale')}><Icon d={ICONS.plus} size={13} /> Neuer Kunde</button>
           <span className="spacer" />
           <span style={{ fontSize: 11.5, color: 'var(--n-500)' }}>Esc schliessen</span>
           {sale.customer ? (

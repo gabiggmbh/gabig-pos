@@ -1,6 +1,6 @@
 import type {
   CompanyDto, LocationFlatDto, ProductVariantFlatDto, CustomerDto,
-  PaymentMethodDto, OrderStatusDto, ProductProfileDto, OrderDto,
+  PaymentMethodDto, OrderStatusDto, ProductProfileDto, OrderDto, CustomerFormData,
 } from './types';
 
 const API_BASE = 'https://api.gabig.app';
@@ -58,6 +58,15 @@ export const api = {
 
   listCustomers: (search: string) =>
     req<CustomerDto[]>(`/v1/customer?search=${encodeURIComponent(search)}&limit=20`),
+
+  getCustomer: (uuid: string) =>
+    req<CustomerDto>(`/v1/customer/${uuid}`),
+
+  createCustomer: (body: CustomerFormData) =>
+    req<CustomerDto>('/v1/customer', { method: 'POST', body: JSON.stringify(body) }),
+
+  updateCustomer: (uuid: string, body: Partial<CustomerFormData>) =>
+    req<CustomerDto>(`/v1/customer/${uuid}`, { method: 'PUT', body: JSON.stringify(body) }),
 
   createOrder: (body: object, test = false) =>
     req<OrderDto>(`/v1/order${test ? '?test=true' : ''}`, { method: 'POST', body: JSON.stringify(body) }),

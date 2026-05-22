@@ -2,11 +2,11 @@ import { useApp } from '../App';
 import { Icon, ICONS, LogoMark } from './Icons';
 
 export default function NavRail({ active = 'sale' }: { active?: string }) {
-  const { logout } = useApp();
+  const { logout, navigate } = useApp();
   return (
     <div className="pos-nav">
       <div className="logo"><LogoMark /></div>
-      <div className={`nav-item ${active === 'sale' ? 'active' : ''}`}>
+      <div className={`nav-item ${active === 'sale' ? 'active' : ''}`} onClick={() => navigate('sale')} style={{ cursor: 'pointer' }}>
         <div className="ic"><Icon d={ICONS.cart} size={20} /></div>
         <span>Verkauf</span>
       </div>
@@ -14,7 +14,7 @@ export default function NavRail({ active = 'sale' }: { active?: string }) {
         <div className="ic"><Icon d={ICONS.refund} size={20} /></div>
         <span>Retoure</span>
       </div>
-      <div className="nav-item">
+      <div className={`nav-item ${active === 'customers' ? 'active' : ''}`} onClick={() => navigate('customer_list')} style={{ cursor: 'pointer' }}>
         <div className="ic"><Icon d={ICONS.user} size={20} /></div>
         <span>Kunden</span>
       </div>

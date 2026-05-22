@@ -4,7 +4,7 @@ import { SDKProvider } from './sdk';
 import { api } from './api';
 import type {
   Screen, SaleState, LocalLineItem, UserData, CompanyDto,
-  LocationFlatDto, PaymentMethodDto, CustomerDto, PaymentType,
+  LocationFlatDto, PaymentMethodDto, CustomerDto, PaymentType, CustomerFormData,
 } from './types';
 import Login from './screens/Login';
 import StationSelect from './screens/StationSelect';
@@ -13,6 +13,9 @@ import PaymentSelect from './screens/PaymentSelect';
 import CardPayment from './screens/CardPayment';
 import CashPayment from './screens/CashPayment';
 import Receipt from './screens/Receipt';
+import CustomerList from './screens/CustomerList';
+import CustomerDetail from './screens/CustomerDetail';
+import CustomerNew from './screens/CustomerNew';
 
 export interface AppContextType {
   screen: Screen;
@@ -33,6 +36,13 @@ export interface AppContextType {
   confirmPayment(type: PaymentType, cashReceived?: number): Promise<void>;
   newSale(): void;
   logout(): void;
+  viewedCustomer: CustomerDto | null;
+  customerNewReturnTo: Screen | null;
+  viewCustomer(c: CustomerDto): void;
+  startSaleWithCustomer(c: CustomerDto): void;
+  openCustomerNew(returnTo: Screen): void;
+  saveNewCustomer(data: CustomerFormData): Promise<void>;
+  updateViewedCustomer(uuid: string, data: CustomerFormData): Promise<void>;
 }
 
 export const AppContext = React.createContext<AppContextType>(null!);
@@ -73,6 +83,8 @@ export default function App() {
   const [sale, setSale] = React.useState<SaleState>(initialSale);
   const [loginError, setLoginError] = React.useState<string | null>(null);
   const [scanError, setScanError] = React.useState<string | null>(null);
+  const [viewedCustomer, setViewedCustomer] = React.useState<CustomerDto | null>(null);
+  const [customerNewReturnTo, setCustomerNewReturnTo] = React.useState<Screen | null>(null);
 
   // Keep refs so async functions always see latest state
   const saleRef = React.useRef(sale);
@@ -315,6 +327,37 @@ export default function App() {
     setScreen('sale');
   }
 
+  function viewCustomer(c: CustomerDto) {
+    setViewedCustomer(c);
+    setScreen('customer_detail');
+  }
+
+  function startSaleWithCustomer(c: CustomerDto) {
+    setCustomer(c);
+    setScreen('sale');
+  }
+
+  function openCustomerNew(returnTo: Screen) {
+    setCustomerNewReturnTo(returnTo);
+    setScreen('customer_new');
+  }
+
+  async function saveNewCustomer(data: CustomerFormData) {
+    const newCustomer = await api.createCustomer(data);
+    if (customerNewReturnTo === 'sale') {
+      setCustomer(newCustomer);
+      setScreen('sale');
+    } else {
+      setViewedCustomer(newCustomer);
+      setScreen('customer_detail');
+    }
+  }
+
+  async function updateViewedCustomer(uuid: string, data: CustomerFormData) {
+    const updated = await api.updateCustomer(uuid, data);
+    setViewedCustomer(updated);
+  }
+
   function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('pos_station');
@@ -330,6 +373,8 @@ export default function App() {
     loginError, scanError,
     login, selectStation, scanProduct, updateQuantity, removeItem,
     setCustomer, navigate, confirmPayment, newSale, logout,
+    viewedCustomer, customerNewReturnTo,
+    viewCustomer, startSaleWithCustomer, openCustomerNew, saveNewCustomer, updateViewedCustomer,
   };
 
   return (
@@ -342,6 +387,9 @@ export default function App() {
         {screen === 'card_payment' && <CardPayment />}
         {screen === 'cash_payment' && <CashPayment />}
         {screen === 'receipt' && <Receipt />}
+        {screen === 'customer_list' && <CustomerList />}
+        {screen === 'customer_detail' && <CustomerDetail />}
+        {screen === 'customer_new' && <CustomerNew />}
       </AppContext.Provider>
     </SDKProvider>
   );
